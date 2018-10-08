@@ -3,7 +3,7 @@
 #include "../user_config.h"
 
 #ifndef MYAVR
-#error "Define the macro MYAVR as 0 (ATmega328|P) or 1(ATmega8) in user_config.h"
+#error "Define the macro MYAVR as 0 (ATmega328|P) or 1 (ATmega8) in user_config.h"
 #endif
 
 #if (MYAVR == 0)
@@ -13,6 +13,5 @@
 #else
 #error "MYAVR is defined but the value isn't 0 0r 1."
 #endif
-
 
 #endif //__EMB_SERIAL_CONFIG_H__
