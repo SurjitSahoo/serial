@@ -6,7 +6,7 @@ int myfunc(void)
 {
 	return 0;
 }
-
+ 
 #include<stdlib.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -16,62 +16,67 @@ int myfunc(void)
 static status_t sanity_check_config(const SerialPortConfig_t* config);
 static status_t sanity_check_device(const SerialPort_t* device);
 
-#define F_CPU 16000000L
-#define SET_BIT(REG,BIT) REG |= (1 << BIT)
-#define CLR_BIT(REG,BIT) REG &= (~(1 << BIT ))
-#define IS_BIT_SET(REG, BIT) ((REG & (1 << BIT)) == 0 ? 0 : 1)
-#define BAUD_SCALE(BAUD_RATE) ((( F_CPU / 16) + ( BAUD_RATE/ 2)) / ( BAUD_RATE) - 1)
 
 struct __serial_port_device
 {
-	EnSerialBaud_t    baud;
-	EnSerialParity_t  parity;
-	EnSerialStopBit_t stopBit;
-	uint8_t           is_open;
-	uint8_t			  id;
+	EnSerialBaud_t		baud;
+	EnSerialParity_t	parity;
+	EnSerialStopBit_t	stopBit;
+	uint8_t			 	id;
+	void*				extra;
 };
 
-#define MAX_PORTS  1
+uint8_t id = 0;
+
 static status_t sanity_check_config(const SerialPortConfig_t* config){
 	if(config == 0){
-		return enBoolean_False;
+		return CONFIG_NULL;
 	}
     if(config->baud < enSerialBaud_9600 || config->baud > enSerialBaud_Max){
-		return enBoolean_False;
+		return CONFIG_INVALID_BAUD;
     }
     if(config->parity < enSerialParity_ODD || config->parity > enSerialParity_Max){
-		return enBoolean_False;
+		return CONFIG_INVALID_PARITY;
     }
     if(config->stopBit < enSerialStopBit_One || config->stopBit > enSerialStopBit_Max){
-		return enBoolean_False;
+		return CONFIG_INVALID_STOP_BIT;
     }
+	return enBoolean_True;
 }
 
 static status_t sanity_check_device(const SerialPort_t* device){
 	if(device == 0){
-		return enBoolean_False;
+		return DEVICE_NULL;
 	}
     if(device->baud < enSerialBaud_9600 || device->baud > enSerialBaud_Max){
-		return enBoolean_False;
+		return DEVICE_INVALID_BAUD;
     }
     if(device->parity < enSerialParity_ODD || device->parity > enSerialParity_Max){
-		return enBoolean_False;
+		return DEVICE_INVALID_PARITY;
     }
     if(device->stopBit < enSerialStopBit_One || device->stopBit > enSerialStopBit_Max){
-		return enBoolean_False;
+		return DEVICE_INVALID_STOP_BIT;
     }
 }
 
 SerialPort_t* SerialPort_new(SerialPortConfig_t* config, status_t* result)
 {
 	if(result == 0){
+		return SERIAL_RESULT_NULL;
+	}
+	
+	if(id >= MAX_PORT){
+		*result = MAX_PORT_REACHED;
 		return 0;
 	}
+
 	//Sanity check
 	*result = sanity_check_config(config);
-	if(*result == 0){
+	if(*result != enBoolean_True){
 		return 0;
 	}
+
+	
 	//malloc and create a serial_port_device
 	SerialPort_t* dev = (SerialPort_t *)malloc(sizeof(struct __serial_port_device));
 
@@ -80,32 +85,32 @@ SerialPort_t* SerialPort_new(SerialPortConfig_t* config, status_t* result)
 	{
 		case 0:
 			ubrr = BAUD_SCALE(9600);
-			UBRR0H = (unsigned char)(ubrr >> 8);
-			UBRR0L = (unsigned char) ubrr;
+			UBRRH = (unsigned char)(ubrr >> 8);
+			UBRRL = (unsigned char) ubrr;
 			dev->baud = enSerialBaud_9600;
 			break;
 		case 1 :
 			ubrr = BAUD_SCALE(19200);
-			UBRR0H = (unsigned char)(ubrr >> 8);
-			UBRR0L = (unsigned char) ubrr;
+			UBRRH = (unsigned char)(ubrr >> 8);
+			UBRRL = (unsigned char) ubrr;
 			dev->baud = enSerialBaud_19200;
 			break;
 		case 2 :
 			ubrr = BAUD_SCALE(38400);
-			UBRR0H = (unsigned char)(ubrr >> 8);
-			UBRR0L = (unsigned char) ubrr;
+			UBRRH = (unsigned char)(ubrr >> 8);
+			UBRRL = (unsigned char) ubrr;
 			dev->baud = enSerialBaud_38400;
 			break;
 		case 3 :
 			ubrr = BAUD_SCALE(57600);
-			UBRR0H = (unsigned char)(ubrr >> 8);
-			UBRR0L = (unsigned char) ubrr;
+			UBRRH = (unsigned char)(ubrr >> 8);
+			UBRRL = (unsigned char) ubrr;
 			dev->baud = enSerialBaud_57600;
 			break;
 		case 4 :
 			ubrr = BAUD_SCALE(115200);
-			UBRR0H = (unsigned char)(ubrr >> 8);
-			UBRR0L = (unsigned char) ubrr;
+			UBRRH = (unsigned char)(ubrr >> 8);
+			UBRRL = (unsigned char) ubrr;
 			dev->baud = enSerialBaud_115200;
 			break;
 		default :
@@ -161,6 +166,7 @@ SerialPort_t* SerialPort_new(SerialPortConfig_t* config, status_t* result)
 
 	dev->is_open = enBoolean_False;
 	*result = enBoolean_True;
+	id++;
 	return dev;
 }
 
