@@ -1,17 +1,15 @@
 #include "../include/serial.h"
 
-
 #include <avr/io.h>
-int myfunc(void)
-{
-	return 0;
-}
- 
-#include<stdlib.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
+#include <stdlib.h>
 
-#include "uart.h"
+#if(defined(APPLICATION_AVR) && (APPLICATION_AVR == 0))
+#define _UBRRH(ID)	"UBRR" ID "H"
+#define _UBRRL(ID)	"UBRR" ID "L"
+#elif(defined(APPLICATION_AVR) && (APPLICATION_AVR == 1))
+#define _UBRRH(ID)	"UBRRH"
+#define _UBRRL(ID)	"UBRRL"
+#endif
 
 static status_t sanity_check_config(const SerialPortConfig_t* config);
 static status_t sanity_check_device(const SerialPort_t* device);
@@ -47,6 +45,9 @@ static status_t sanity_check_config(const SerialPortConfig_t* config){
 static status_t sanity_check_device(const SerialPort_t* device){
 	if(device == 0){
 		return DEVICE_NULL;
+	}
+	if(device->id >= MAX_PORT){
+		return MAX_PORT_REACHED;
 	}
     if(device->baud < enSerialBaud_9600 || device->baud > enSerialBaud_Max){
 		return DEVICE_INVALID_BAUD;
@@ -85,88 +86,96 @@ SerialPort_t* SerialPort_new(SerialPortConfig_t* config, status_t* result)
 	{
 		case 0:
 			ubrr = BAUD_SCALE(9600);
-			UBRRH = (unsigned char)(ubrr >> 8);
-			UBRRL = (unsigned char) ubrr;
+			_UBRRH(id) = (unsigned char)(ubrr >> 8);
+			_UBRRL(id) = (unsigned char) ubrr;
 			dev->baud = enSerialBaud_9600;
 			break;
 		case 1 :
 			ubrr = BAUD_SCALE(19200);
-			UBRRH = (unsigned char)(ubrr >> 8);
-			UBRRL = (unsigned char) ubrr;
+			_UBRRH(id) = (unsigned char)(ubrr >> 8);
+			_UBRRL(id) = (unsigned char) ubrr;
 			dev->baud = enSerialBaud_19200;
 			break;
 		case 2 :
 			ubrr = BAUD_SCALE(38400);
-			UBRRH = (unsigned char)(ubrr >> 8);
-			UBRRL = (unsigned char) ubrr;
+			_UBRRH(id) = (unsigned char)(ubrr >> 8);
+			_UBRRL(id) = (unsigned char) ubrr;
 			dev->baud = enSerialBaud_38400;
 			break;
 		case 3 :
 			ubrr = BAUD_SCALE(57600);
-			UBRRH = (unsigned char)(ubrr >> 8);
-			UBRRL = (unsigned char) ubrr;
+			_UBRRH(id) = (unsigned char)(ubrr >> 8);
+			_UBRRL(id) = (unsigned char) ubrr;
 			dev->baud = enSerialBaud_57600;
 			break;
 		case 4 :
 			ubrr = BAUD_SCALE(115200);
-			UBRRH = (unsigned char)(ubrr >> 8);
-			UBRRL = (unsigned char) ubrr;
+			_UBRRH(id) = (unsigned char)(ubrr >> 8);
+			_UBRRL(id) = (unsigned char) ubrr;
 			dev->baud = enSerialBaud_115200;
 			break;
 		default :
 			free(dev);
-			*result = enBoolean_False;
+			*result = DEVICE_INVALID_BAUD;
 
 	}
-	switch(config->parity)
-	{
+
+	switch(APPLICATION_AVR){
 		case 0:
-			SET_BIT(UCSR0C, UPM00);
-			SET_BIT(UCSR0C, UPM01);
-			dev->parity = enSerialParity_ODD;
-			break;
-		case 1 :
-			CLR_BIT(UCSR0C, UPM00);
-			SET_BIT(UCSR0C, UPM01);
-			dev->parity = enSerialParity_Even;
-			break;
+			switch(config->parity)
+			{
+				case 0:
+					SET_BIT(UCSR0C, UPM00);
+					SET_BIT(UCSR0C, UPM01);
+					dev->parity = enSerialParity_ODD;
+					break;
+				case 1 :
+					CLR_BIT(UCSR0C, UPM00);
+					SET_BIT(UCSR0C, UPM01);
+					dev->parity = enSerialParity_Even;
+					break;
+				default :
+					free(dev);
+					*result = DEVICE_INVALID_PARITY;
+			}
+			
+			switch(config->stopBit)
+			{
+				case 0 : 
+					CLR_BIT(UCSR0C, USBS0);
+					dev->stopBit = enSerialStopBit_One;
+					break;
+				case 1 :
+					free(dev);
+					*result = enBoolean_False;
+					return enBoolean_False;
+					break;
+				case 2 :
+					SET_BIT(UCSR0C, USBS0);
+					dev->stopBit = enSerialStopBit_Two;
+					break;
+				default :
+					free(dev);
+					*result = DEVICE_INVALID_STOP_BIT;
+			}
+
+			// Mode select
+			CLR_BIT(UCSR0C, UMSEL00);
+			CLR_BIT(UCSR0C, UMSEL01);
+
+			//Frame size
+			SET_BIT(UCSR0C, UCSZ00);
+			SET_BIT(UCSR0C, UCSZ01);
+			CLR_BIT(UCSR0B, UCSZ02);
+
+			dev->is_open = enBoolean_False;
+			*result = enBoolean_True;
+			id++;
 		default :
 			free(dev);
-			*result = enBoolean_False;
+			*result = 0;
 	}
-	
-	switch(config->stopBit)
-	{
-		case 0 : 
-			CLR_BIT(UCSR0C, USBS0);
-			dev->stopBit = enSerialStopBit_One;
-			break;
-		case 1 :
-			free(dev);
-			*result = enBoolean_False;
-			return enBoolean_False;
-			break;
-		case 2 :
-			SET_BIT(UCSR0C, USBS0);
-			dev->stopBit = enSerialStopBit_Two;
-			break;
-		default :
-			free(dev);
-			*result = enBoolean_False;
 
-	}
-    // Mode select
-	CLR_BIT(UCSR0C, UMSEL00);
-    CLR_BIT(UCSR0C, UMSEL01);
-
-    //Frame size
-	SET_BIT(UCSR0C, UCSZ00);
-	SET_BIT(UCSR0C, UCSZ01);
-	CLR_BIT(UCSR0B, UCSZ02);
-
-	dev->is_open = enBoolean_False;
-	*result = enBoolean_True;
-	id++;
 	return dev;
 }
 
@@ -182,7 +191,7 @@ status_t SerialPort_open(SerialPort_t* device)
 {
 	//Sanity check
 	status_t status = sanity_check_device(device);
-	if(status == 0){
+	if(status != enBoolean_True){
 		return enBoolean_False;
 	}
 	switch(device->id) {
@@ -193,8 +202,9 @@ status_t SerialPort_open(SerialPort_t* device)
 			if(IS_BIT_SET(UCSR0B, RXEN0) == 0){
 				SET_BIT(UCSR0B, TXEN0);
 			}
-			device->is_open = enBoolean_True;
 			return enBoolean_True;
+		case 1 :
+			//code for case
 		default :
 			return enBoolean_False;
 	}
