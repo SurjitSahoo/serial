@@ -26,7 +26,11 @@
 					<SourcePath></SourcePath>
 				</d4p1:anyType>
 				<d4p1:anyType i:type="FileInfo">
+<<<<<<< HEAD
 					<AbsolutePath>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.209\include\avr\iom328p.h</AbsolutePath>
+=======
+					<AbsolutePath>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.209\include\avr\iom328.h</AbsolutePath>
+>>>>>>> 3ee4c9472d083068e92e9a95af06d8754cde4d86
 					<Attribute></Attribute>
 					<Category>header</Category>
 					<Condition>C</Condition>
@@ -59,7 +63,11 @@
 					<SourcePath></SourcePath>
 				</d4p1:anyType>
 				<d4p1:anyType i:type="FileInfo">
+<<<<<<< HEAD
 					<AbsolutePath>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.209\gcc\dev\atmega328p</AbsolutePath>
+=======
+					<AbsolutePath>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.209\gcc\dev\atmega328</AbsolutePath>
+>>>>>>> 3ee4c9472d083068e92e9a95af06d8754cde4d86
 					<Attribute></Attribute>
 					<Category>libraryPrefix</Category>
 					<Condition>GCC</Condition>
