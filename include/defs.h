@@ -2,6 +2,7 @@
 #define __EMB_SERIAL_DEFS_H__
 #include "config.h"
 
+#define MYNULL  NULL
 //Error Codes
 #define BASE_SERIAL_STATUS_CODE 0x1000
 

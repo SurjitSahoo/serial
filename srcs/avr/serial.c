@@ -9,9 +9,6 @@ static status_t sanity_check_device(const SerialPort_t* device);
 
 struct __serial_port_device
 {
-	EnSerialBaud_t		baud;
-	EnSerialParity_t	parity;
-	EnSerialStopBit_t	stopBit;
 	uint8_t			 	id;
 	void*				extra;
 };

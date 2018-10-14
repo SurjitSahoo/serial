@@ -8,7 +8,12 @@
 #if (MYAVR == 0)
 #define APPLICATION_AVR 0
 #define F_CPU           16000000L
-#define MAX_PORT        1
+    //This device supports only one UART port
+    #if(defined(PORTS) && PORTS == 1)
+    #define MAX_PORT    1
+    #else
+    #define MAX_PORT    0
+    #endif
 
 #elif (MYAVR == 1)
 #define APPLICATION_AVR 1
