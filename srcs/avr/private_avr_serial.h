@@ -28,4 +28,6 @@
 #define IS_BIT_SET(REG, BIT)    ((REG & (1 << BIT)) == 0 ? 0 : 1)
 #define BAUD_SCALE(BAUD_RATE)   ((( F_CPU / 16) + ( BAUD_RATE/ 2)) / ( BAUD_RATE) - 1)
 
+
+
 #endif //__PRIVATE_AVR_SERIAL_H__

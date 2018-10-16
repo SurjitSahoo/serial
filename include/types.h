@@ -28,19 +28,33 @@ typedef enum
 	enSerialStopBit_Max
 }EnSerialStopBit_t;
 
+typedef enum
+{
+	enSerialMode_uart,
+	enSerialMode_usart
+}EnSerialMode_t;
 
+typedef enum
+{
+	enSerialFrame_5bit,
+	enSerialFrame_6bit,
+	enSerialFrame_7bit,
+	enSerialFrame_8bit
+}EnSerialFrame_t
 
 typedef struct
 {
-	EnSerialBaud_t    baud;
-	EnSerialParity_t  parity;
-	EnSerialStopBit_t stopBit;
+	EnSerialBaud_t		baud;
+	EnSerialParity_t	parity;
+	EnSerialStopBit_t	stopBit;
+	EnSerialMode_t		mode;
+	EnSerialFrame_t		frame;
 }SerialPortConfig_t;
 
 typedef enum
 {
 	enBoolean_False,
-	enBoolean_True,
+	enBoolean_True
 }EnBoolean_t;
 
 

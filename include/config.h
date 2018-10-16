@@ -1,4 +1,4 @@
-#ifndef __EMB_SERIAL_CONFIG_H__
+ #ifndef __EMB_SERIAL_CONFIG_H__
 #define __EMB_SERIAL_CONFIG_H__
 #include "../user_config.h"
 
