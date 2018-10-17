@@ -40,7 +40,7 @@ typedef enum
 	enSerialFrame_6bit,
 	enSerialFrame_7bit,
 	enSerialFrame_8bit
-}EnSerialFrame_t
+}EnSerialFrame_t;
 
 typedef struct
 {

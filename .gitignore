@@ -2,3 +2,5 @@
 ./build/.vs
 ./build/serial_avr/.vs
 ./build/serial_avr/Debug
+*.o
+*.a

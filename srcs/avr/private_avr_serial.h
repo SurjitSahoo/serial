@@ -23,8 +23,8 @@
 #error "MYAVR is defined but the value isn't 0 0r 1."
 #endif
 
-#define SET_BIT(REG,BIT)        REG |= (1 << BIT)
-#define CLR_BIT(REG,BIT)        REG &= (~(1 << BIT ))
+#define SET_BIT(REG, BIT)        (REG |= (1 << BIT))
+#define CLR_BIT(REG, BIT)        (REG &= (~(1 << BIT)))
 #define IS_BIT_SET(REG, BIT)    ((REG & (1 << BIT)) == 0 ? 0 : 1)
 #define BAUD_SCALE(BAUD_RATE)   ((( F_CPU / 16) + ( BAUD_RATE/ 2)) / ( BAUD_RATE) - 1)
 

@@ -15,6 +15,6 @@ status_t set_serial_baud(SerialPort_t* device, EnSerialBaud_t baud);
 status_t set_serial_parity(SerialPort_t* device, EnSerialParity_t parity);
 status_t set_serial_stopbit(SerialPort_t* device, EnSerialStopBit_t stopBit);
 status_t set_serial_mode(SerialPort_t* dev, EnSerialMode_t mode);
-status_t set_serial_frame(SerialPort_t* device, enserialfram);
+status_t set_serial_frame(SerialPort_t* device, EnSerialFrame_t frame);
 
 #endif //__EMB_SERIAL_H__
