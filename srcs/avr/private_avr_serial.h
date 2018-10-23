@@ -1,6 +1,8 @@
 #ifndef __PRIVATE_AVR_SERIAL_H__
 #define __PRIVATE_AVR_SERIAL_H__
 
+#include "../../include/serial.h"
+
 #ifndef MYAVR
 #error "This source file is only meant for avr family of processors."
 #endif
